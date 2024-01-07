@@ -8,7 +8,7 @@ Making sure Docker is running in the background. So, let's check the Docker stat
 sudo systemctl status docker
 ```
 
-![docker-status](https://lab-bucket.s3.brilliant.com.bd/labthumbnail/1fe9dc4c-5ff9-4c98-812e-fa8d4fcf27e0.png)
+![docker-status](https://lab-bucket.s3.brilliant.com.bd/labthumbnail/85711c14-03fb-4c03-8e71-ab800a8f5a4e.png)
 
 
 ## `Available Network Interfaces`
