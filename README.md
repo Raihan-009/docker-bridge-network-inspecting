@@ -129,3 +129,83 @@ The Docker bridge network `docker0` is configured with specific options:
 - `Host Binding IPv4`: Binds the bridge network to all available host network interfaces.
 - `Bridge Name`: Identified as "docker0" for the Docker bridge network.
 - `MTU (Maximum Transmission Unit)`: Configured with an MTU of 1500 bytes for packet transmission.
+
+---
+
+## `Create a Bridge network with a Subnet and Gateway`
+
+```bash
+docker network create --subnet 10.1.0.0/16 --gateway 10.1.0.1 \
+--driver=bridge --label=development v-br
+```
+***Expected Output***
+
+```bash
+{
+        "Name": "v-br",
+        "Id": "cb3d7ed948f1becf542b540743b8adc702b624e5042bd8073496a7325558d790",
+        "Created": "2024-01-07T13:24:50.67153161Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "10.1.0.0/16",
+                    "Gateway": "10.1.0.1"
+                }
+            ]
+        }
+```
+
+## `Run a Docker Container Under a Specific Network`
+
+Let's verify the newly created `v-br` bridge network. The idea is that we are going to create a container inside the `v-br` network and inspect the assigned IP address, whether it is from the `v-br` subnet or not, and also check the default gateway.
+
+So first of all, we need to run a container. Here, we will run Ubuntu as a container.
+
+```bash
+docker run  --name host-vm -it --network v-br ubuntu /bin/bash
+```
+## `Prerequisites`
+
+We need to install some prerequisites to use some IP utilities.
+
+```bash
+apt update
+apt install iproute2
+apt install net-tools
+```
+Now let's find out the network interface of this container.
+
+```bash
+ifconfig
+```
+
+***Expected Output***
+```
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.1.0.2  netmask 255.255.0.0  broadcast 10.1.255.255
+        ether 02:42:0a:01:00:02  txqueuelen 0  (Ethernet)
+        RX packets 2296  bytes 30753167 (30.7 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 1403  bytes 104325 (104.3 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+Let's check the default gateway.
+
+```bash
+netstat -rn
+```
+
+```bash
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.1.0.1        0.0.0.0         UG        0 0          0 eth0
+10.1.0.0        0.0.0.0         255.255.0.0     U         0 0          0 eth0
+```
+
+Bingo! Everything is matched according to the `v-br` bridge network.
