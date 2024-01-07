@@ -74,3 +74,58 @@ NETWORK ID     NAME         DRIVER    SCOPE
 ```
 
 This command provides an overview of the Docker networks present on our host, including their names, network IDs, drivers, and scopes.
+
+## `Inspecting Bridge Network`
+
+```bash
+docker network inspect bridge
+```
+
+```bash
+[
+    {
+        "Name": "bridge",
+        "Id": "5bd6001154b40902583da5d50908a7226b82b809d4af39949cdda897bc1a3170",
+        "Created": "2023-11-30T06:48:14.189396785Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+...
+...
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+```
+
+
+Let's talk about `subnet` and `gateway` under the "Config" section and some other configurations under the "Options" section.
+
+## `Config`
+This configuration indicates that the Docker bridge network (`docker0`) is configured with a subnet of `172.17.0.0/16`, and the default `gateway` for containers on this network is set to `172.17.0.1`. Containers connected to this bridge network will be assigned IP addresses within the specified subnet range, and the bridge interface (`docker0`) will act as the gateway for their outbound traffic.
+
+## `Options`
+The Docker bridge network `docker0` is configured with specific options:
+- `Default Bridge`: Marked as the default bridge network.
+- `Inter-Container Communication (ICC)`: Enabled for communication between containers on the same bridge.
+- `IP Masquerade`: Allows NAT for outbound packets from containers.
+- `Host Binding IPv4`: Binds the bridge network to all available host network interfaces.
+- `Bridge Name`: Identified as "docker0" for the Docker bridge network.
+- `MTU (Maximum Transmission Unit)`: Configured with an MTU of 1500 bytes for packet transmission.
